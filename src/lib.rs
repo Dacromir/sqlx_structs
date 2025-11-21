@@ -14,7 +14,7 @@ pub struct Employee {
     pub team: Team,
 }
 
-/// The struct that's easy to get working up front, but will add more work down the line
+/// The struct that's easy to implement, but will require more work to use
 #[derive(Debug, FromRow, PartialEq)]
 pub struct EmployeeWithTeamId {
     pub id: u64,
@@ -46,8 +46,8 @@ impl Type<Sqlite> for Team {
     }
 }
 
-/// Creates a test sqlite3 db located at `test_db/{random_uuid}.db` filled with dummy data
-pub async fn get_pool() -> Pool<Sqlite> {
+/// Creates a test sqlite3 db located at `test_db/{random_uuid}.db` populated with dummy data
+pub async fn get_test_db() -> Pool<Sqlite> {
     // Create db folder if needed
     let path = Path::new("test_db");
     if !path.exists() {
@@ -117,9 +117,8 @@ mod tests {
 
     /// Makes sure we can create a db without panicking.
     #[tokio::test]
-    async fn create_db() {
-        let _pool = get_pool().await;
-        assert!(true);
+    async fn create_test_db() {
+        let _pool = get_test_db().await;
     }
 
     /// Get EmployeeWithTeamId from db. This works, but it's not ideal behavior to me.
@@ -127,7 +126,7 @@ mod tests {
     #[tokio::test]
     async fn get_employee_with_team_id() {
         // Create DB and connect
-        let pool: Pool<Sqlite> = get_pool().await;
+        let pool: Pool<Sqlite> = get_test_db().await;
         let mut conn = pool.acquire().await.unwrap();
 
         // Get employee # 1 from DB
@@ -151,7 +150,7 @@ mod tests {
     #[tokio::test]
     async fn get_employee() {
         // Create DB and connect
-        let pool: Pool<Sqlite> = get_pool().await;
+        let pool: Pool<Sqlite> = get_test_db().await;
         let mut conn = pool.acquire().await.unwrap();
 
         // Get employee # 1 from DB
