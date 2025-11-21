@@ -152,5 +152,9 @@ mod tests {
 
         // Make sure that DB output matches expected
         assert_eq!(employee, expected_employee);
+
+        // Because we've actually fetched the team (not just team ID), we can access Team fields.
+        // This would take a second query in the previous method (using EmployeeWithId)
+        dbg!(&employee.team.name);
     }
 }
