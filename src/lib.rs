@@ -1,8 +1,12 @@
 use std::str::FromStr;
 
-use sqlx::{Acquire, FromRow, Pool, Sqlite, SqlitePool, raw_sql, sqlite::SqliteConnectOptions};
+use sqlx::{
+    Acquire, Database, Decode, FromRow, Pool, Sqlite, SqlitePool, Type, raw_sql,
+    sqlite::SqliteConnectOptions,
+};
 use uuid::Uuid;
 
+#[derive(Debug, FromRow, PartialEq)]
 pub struct Employee {
     pub id: u64,
     pub name: String,
@@ -18,11 +22,29 @@ pub struct EmployeeWithId {
 
 pub type TeamId = u64;
 
+#[derive(Debug, Decode, PartialEq)]
 pub struct Team {
     pub id: TeamId,
     pub name: String,
 }
 
+// Would not compile without this trait implementation
+impl<'r, DB: Database> Decode<'r, DB> for Team {
+    fn decode(
+        _value: <DB as sqlx::Database>::ValueRef<'r>,
+    ) -> Result<Self, sqlx::error::BoxDynError> {
+        todo!()
+    }
+}
+
+// Would not compile without this trait implementation
+impl Type<Sqlite> for Team {
+    fn type_info() -> <Sqlite as Database>::TypeInfo {
+        todo!()
+    }
+}
+
+/// Creates a test sqlite3 db located at `test_db/{random_uuid}.db` filled with dummy data
 pub async fn get_pool() -> Pool<Sqlite> {
     // Create a new uuid (for test db)
     let id = Uuid::new_v4();
@@ -89,6 +111,34 @@ mod tests {
             id: 1,
             name: String::from("Boston Alice"),
             team: 1,
+        };
+
+        // Make sure that DB output matches expected
+        assert_eq!(employee, expected_employee);
+    }
+
+    /// Get Employee
+    #[tokio::test]
+    async fn get_employee() {
+        // Create DB and connect
+        let pool = get_pool().await;
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Get employee # 1 from DB
+        let employee: Employee = query_as("SELECT * FROM employees WHERE id = 1")
+            .fetch_one(&mut *conn)
+            .await
+            .unwrap();
+
+        // Create expected output manually
+        let expected_team = Team {
+            id: 1,
+            name: String::from("East Coast Team"),
+        };
+        let expected_employee = Employee {
+            id: 1,
+            name: String::from("Boston Alice"),
+            team: expected_team,
         };
 
         // Make sure that DB output matches expected
