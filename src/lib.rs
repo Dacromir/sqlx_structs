@@ -106,7 +106,7 @@ mod tests {
     #[tokio::test]
     async fn get_employee_with_team_id() {
         // Create DB and connect
-        let pool = get_pool().await;
+        let pool: Pool<Sqlite> = get_pool().await;
         let mut conn = pool.acquire().await.unwrap();
 
         // Get employee # 1 from DB
@@ -130,7 +130,7 @@ mod tests {
     #[tokio::test]
     async fn get_employee() {
         // Create DB and connect
-        let pool = get_pool().await;
+        let pool: Pool<Sqlite> = get_pool().await;
         let mut conn = pool.acquire().await.unwrap();
 
         // Get employee # 1 from DB
