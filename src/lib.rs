@@ -69,16 +69,35 @@ pub async fn get_pool() -> Pool<Sqlite> {
     let mut tx = conn.begin().await.unwrap();
 
     // Run schema query
-    raw_sql(include_str!("sql/schema.sql"))
-        .execute(&mut *tx)
-        .await
-        .unwrap();
+    let schema_sql = "
+        CREATE TABLE teams (
+            id INTEGER PRIMARY KEY,
+            name TEXT
+        );
+
+        CREATE TABLE employees (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            team INTEGER,
+            FOREIGN KEY (team) REFERENCES teams(id)
+        );";
+    raw_sql(schema_sql).execute(&mut *tx).await.unwrap();
 
     // Run dummy data query
-    raw_sql(include_str!("sql/dummy_data.sql"))
-        .execute(&mut *tx)
-        .await
-        .unwrap();
+    let dummy_data_sql = "
+        INSERT INTO
+            teams (id, name)
+        VALUES
+            (1, 'East Coast Team'),
+            (2, 'West Coast Team');
+
+        INSERT INTO
+            employees (id, name, team)
+        VALUES
+            (1, 'Boston Alice', 1),
+            (2, 'Seattle Bob', 2);
+    ";
+    raw_sql(dummy_data_sql).execute(&mut *tx).await.unwrap();
 
     // Commit and close
     tx.commit().await.unwrap();
