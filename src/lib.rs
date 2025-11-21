@@ -1,8 +1,7 @@
 use std::{fs, path::Path, str::FromStr};
 
 use sqlx::{
-    Acquire, Database, Decode, FromRow, Pool, Sqlite, SqlitePool, Type, raw_sql,
-    sqlite::SqliteConnectOptions,
+    Acquire, Decode, FromRow, Pool, Sqlite, SqlitePool, raw_sql, sqlite::SqliteConnectOptions,
 };
 use uuid::Uuid;
 
@@ -11,6 +10,7 @@ use uuid::Uuid;
 pub struct Employee {
     pub id: u64,
     pub name: String,
+    #[sqlx(flatten)]
     pub team: Team,
 }
 
@@ -24,26 +24,10 @@ pub struct EmployeeWithTeamId {
 
 pub type TeamId = u64;
 
-#[derive(Debug, Decode, PartialEq)]
+#[derive(Debug, Decode, FromRow, PartialEq)]
 pub struct Team {
     pub id: TeamId,
     pub name: String,
-}
-
-// Would not compile without this trait implementation
-impl<'r, DB: Database> Decode<'r, DB> for Team {
-    fn decode(
-        _value: <DB as sqlx::Database>::ValueRef<'r>,
-    ) -> Result<Self, sqlx::error::BoxDynError> {
-        todo!()
-    }
-}
-
-// Would not compile without this trait implementation
-impl Type<Sqlite> for Team {
-    fn type_info() -> <Sqlite as Database>::TypeInfo {
-        todo!()
-    }
 }
 
 /// Creates a test sqlite3 db located at `test_db/{random_uuid}.db` populated with dummy data
