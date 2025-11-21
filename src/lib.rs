@@ -51,3 +51,15 @@ pub async fn get_pool() -> Pool<Sqlite> {
     // Return
     return db_pool;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Makes sure we can create a db without panicking.
+    #[tokio::test]
+    async fn create_db() {
+        let _pool = get_pool().await;
+        assert!(true);
+    }
+}
