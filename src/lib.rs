@@ -176,6 +176,6 @@ mod tests {
 
         // Because we've actually fetched the team (not just team ID), we can access Team fields.
         // This would take a second query in the previous method (using EmployeeWithTeamId)
-        dbg!(&employee.team.name);
+        dbg!(employee.team.name);
     }
 }
