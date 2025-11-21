@@ -6,6 +6,7 @@ use sqlx::{
 };
 use uuid::Uuid;
 
+/// The struct I'd like to use if possible
 #[derive(Debug, FromRow, PartialEq)]
 pub struct Employee {
     pub id: u64,
@@ -13,6 +14,7 @@ pub struct Employee {
     pub team: Team,
 }
 
+/// The struct that's easy to get working up front, but will add more work down the line
 #[derive(Debug, FromRow, PartialEq)]
 pub struct EmployeeWithTeamId {
     pub id: u64,
@@ -120,8 +122,8 @@ mod tests {
         assert!(true);
     }
 
-    /// Get EmployeeWithTeamId from db. This works, but it's not desired behavior.
-    /// If we want information on the Employee's Team, we have to do more querying.
+    /// Get EmployeeWithTeamId from db. This works, but it's not ideal behavior to me.
+    /// If we want information on the Employee's Team, we would have to do more querying.
     #[tokio::test]
     async fn get_employee_with_team_id() {
         // Create DB and connect
