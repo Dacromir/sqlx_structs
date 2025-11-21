@@ -101,7 +101,8 @@ mod tests {
         assert!(true);
     }
 
-    /// Get EmployeeWithId
+    /// Get EmployeeWithId from db. This works, but it's not desired behavior.
+    /// If we want information on the Employee's Team, we have to do more querying.
     #[tokio::test]
     async fn get_employee_with_id() {
         // Create DB and connect
@@ -125,7 +126,7 @@ mod tests {
         assert_eq!(employee, expected_employee);
     }
 
-    /// Get Employee
+    /// Get Employee from DB. Ideally, the Employee struct could be set up such that this test passes.
     #[tokio::test]
     async fn get_employee() {
         // Create DB and connect
