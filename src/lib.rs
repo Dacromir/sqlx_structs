@@ -14,7 +14,7 @@ pub struct Employee {
 }
 
 #[derive(Debug, FromRow, PartialEq)]
-pub struct EmployeeWithId {
+pub struct EmployeeWithTeamId {
     pub id: u64,
     pub name: String,
     pub team: TeamId,
@@ -101,22 +101,22 @@ mod tests {
         assert!(true);
     }
 
-    /// Get EmployeeWithId from db. This works, but it's not desired behavior.
+    /// Get EmployeeWithTeamId from db. This works, but it's not desired behavior.
     /// If we want information on the Employee's Team, we have to do more querying.
     #[tokio::test]
-    async fn get_employee_with_id() {
+    async fn get_employee_with_team_id() {
         // Create DB and connect
         let pool = get_pool().await;
         let mut conn = pool.acquire().await.unwrap();
 
         // Get employee # 1 from DB
-        let employee: EmployeeWithId = query_as("SELECT * FROM employees WHERE id = 1")
+        let employee: EmployeeWithTeamId = query_as("SELECT * FROM employees WHERE id = 1")
             .fetch_one(&mut *conn)
             .await
             .unwrap();
 
         // Create expected output manually
-        let expected_employee = EmployeeWithId {
+        let expected_employee = EmployeeWithTeamId {
             id: 1,
             name: String::from("Boston Alice"),
             team: 1,
@@ -154,7 +154,7 @@ mod tests {
         assert_eq!(employee, expected_employee);
 
         // Because we've actually fetched the team (not just team ID), we can access Team fields.
-        // This would take a second query in the previous method (using EmployeeWithId)
+        // This would take a second query in the previous method (using EmployeeWithTeamId)
         dbg!(&employee.team.name);
     }
 }
