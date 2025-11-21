@@ -1,2 +1,5 @@
 /target
+
+# Test DB files
 *.db
+test_db

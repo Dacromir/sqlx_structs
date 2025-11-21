@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fs, path::Path, str::FromStr};
 
 use sqlx::{
     Acquire, Database, Decode, FromRow, Pool, Sqlite, SqlitePool, Type, raw_sql,
@@ -46,6 +46,14 @@ impl Type<Sqlite> for Team {
 
 /// Creates a test sqlite3 db located at `test_db/{random_uuid}.db` filled with dummy data
 pub async fn get_pool() -> Pool<Sqlite> {
+    // Create db folder if needed
+    let path = Path::new("test_db");
+    if !path.exists() {
+        if !path.is_dir() {
+            let _ = fs::create_dir("test_db");
+        }
+    }
+
     // Create a new uuid (for test db)
     let id = Uuid::new_v4();
     let file_path = format!("test_db/{}.db", id);
